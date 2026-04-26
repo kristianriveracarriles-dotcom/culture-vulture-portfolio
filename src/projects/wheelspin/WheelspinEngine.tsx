@@ -146,7 +146,7 @@ export function LogicPanel({
 
   return (
     <div className={`logic-display ${isOpen ? "open" : "closed"}`}>
-      <h2 className="category-label">> LOGIC_CUSTOMIZER</h2>
+      <h2 className="category-label">&gt; LOGIC_CUSTOMIZER</h2>
       
       <div className="logic-section" style={{ marginTop: '1rem' }}>
         <div className="logic-item">
@@ -207,7 +207,7 @@ export default function WheelspinEngine() {
   return (
     <div className="case-study-grid">
         <div className="rive-portal">
-             <div className="skin-selector" style={{ position: 'absolute', top: '10px', left: '10px', z-index: 10, display: 'flex', gap: '5px' }}>
+             <div className="skin-selector" style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10, display: 'flex', gap: '5px' }}>
                 {SKINS.map((skin) => (
                     <button
                         key={skin.id}

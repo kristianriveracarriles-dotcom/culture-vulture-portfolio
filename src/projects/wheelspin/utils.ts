@@ -37,7 +37,7 @@ const setFontAsset = (asset: FontAsset): void => {
       const bytes = new Uint8Array(await res.arrayBuffer());
       const font = await decodeFont(bytes);
       if (font) {
-        asset.setFont(font);
+        asset.setFont(font as any);
         if (typeof font.unref === 'function') {
           try {
             font.unref();
