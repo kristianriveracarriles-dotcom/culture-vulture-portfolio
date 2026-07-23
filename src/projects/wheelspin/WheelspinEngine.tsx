@@ -50,12 +50,14 @@ const MainVM = {
 
 const spinEventName = "Spin";
 
+const RIVE_LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
+
 function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
   const { rive, RiveComponent } = useRive({
     src: `${ASSET_PATH}${skin.file}`,
     artboard: "Wheelspin Main",
     stateMachines: STATE_MACHINE_NAME,
-    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    layout: RIVE_LAYOUT,
     autoplay: true,
     autoBind: true,
     assetLoader: riveAssetLoaderHandler,
