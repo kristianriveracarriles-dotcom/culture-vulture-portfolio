@@ -8,48 +8,51 @@ import {
 
 const ASSET_PATH = "/assets/rive/";
 
-const setImageAsset = (asset: ImageAsset): void => {
-  const url = `${ASSET_PATH}${asset.name}`;
+const fetchAsset = <T extends any>(
+  url: string,
+  assetName: string,
+  assetType: string,
+  decode: (bytes: Uint8Array) => Promise<T>,
+  applyFn: (decoded: T) => void
+): void => {
   fetch(url, { cache: "force-cache" })
     .then(async (res) => {
       const bytes = new Uint8Array(await res.arrayBuffer());
-      const image = await decodeImage(bytes);
-      if (image) {
-        asset.setRenderImage(image);
-        if (typeof image.unref === 'function') {
+      const decoded = await decode(bytes);
+      if (decoded) {
+        applyFn(decoded);
+        if (typeof (decoded as any).unref === 'function') {
           try {
-            image.unref();
+            (decoded as any).unref();
           } catch (e) {
-            console.warn(`[Rive] Failed to unref image ${asset.name}:`, e);
+            console.warn(`[Rive] Failed to unref ${assetType} ${assetName}:`, e);
           }
         }
       }
     })
     .catch((error) => {
-      console.error(`Error in fetching rive image asset: ${url}`, error);
+      console.error(`Error in fetching rive ${assetType} asset: ${url}`, error);
     });
 };
 
+const setImageAsset = (asset: ImageAsset): void => {
+  fetchAsset(
+    `${ASSET_PATH}${asset.name}`,
+    asset.name,
+    "image",
+    decodeImage,
+    (image) => asset.setRenderImage(image)
+  );
+};
+
 const setFontAsset = (asset: FontAsset): void => {
-  const url = `${ASSET_PATH}${asset.name}.ttf`;
-  fetch(url, { cache: "force-cache" })
-    .then(async (res) => {
-      const bytes = new Uint8Array(await res.arrayBuffer());
-      const font = await decodeFont(bytes);
-      if (font) {
-        asset.setFont(font as any);
-        if (typeof font.unref === 'function') {
-          try {
-            font.unref();
-          } catch (e) {
-            console.warn(`[Rive] Failed to unref font ${asset.name}:`, e);
-          }
-        }
-      }
-    })
-    .catch((error) => {
-      console.error(`Error in fetching rive font asset: ${url}`, error);
-    });
+  fetchAsset(
+    `${ASSET_PATH}${asset.name}.ttf`,
+    asset.name,
+    "font",
+    decodeFont,
+    (font) => asset.setFont(font as any)
+  );
 };
 
 export const riveAssetLoaderHandler = (
