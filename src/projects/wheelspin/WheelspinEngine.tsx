@@ -9,7 +9,7 @@ import {
   useViewModelInstanceEnum,
   useViewModelInstanceString,
 } from "@rive-app/react-webgl2";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { riveAssetLoaderHandler } from "./utils";
 
 const STATE_MACHINE_NAME = "State Machine 1";
@@ -51,6 +51,9 @@ const MainVM = {
 const spinEventName = "Spin";
 
 function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
+  const configRef = useRef(config);
+  configRef.current = config;
+
   const { rive, RiveComponent } = useRive({
     src: `${ASSET_PATH}${skin.file}`,
     artboard: "Wheelspin Main",
@@ -112,9 +115,9 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
         if (name === spinEventName && setResultSliceNumber) {
           setResultSliceNumber(0);
           setTimeout(() => {
-            setResultSliceNumber(config.outcomeIndex + 1);
-            if (setResultPrize) setResultPrize(config.slices[config.outcomeIndex]);
-            if (setResultPrize2) setResultPrize2(config.slices[config.outcomeIndex]);
+            setResultSliceNumber(configRef.current.outcomeIndex + 1);
+            if (setResultPrize) setResultPrize(configRef.current.slices[configRef.current.outcomeIndex]);
+            if (setResultPrize2) setResultPrize2(configRef.current.slices[configRef.current.outcomeIndex]);
           }, 300);
         }
       }
@@ -122,7 +125,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
 
     rive.on(EventType.RiveEvent, handleRiveEvent);
     return () => rive.off(EventType.RiveEvent, handleRiveEvent);
-  }, [rive, config, setResultSliceNumber, setResultPrize, setResultPrize2]);
+  }, [rive, setResultSliceNumber, setResultPrize, setResultPrize2]);
 
   return <RiveComponent />;
 }
