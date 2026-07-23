@@ -8,48 +8,55 @@ import {
 
 const ASSET_PATH = "/assets/rive/";
 
+const imageCache = new Map<string, Promise<any>>();
+const fontCache = new Map<string, Promise<any>>();
+
 const setImageAsset = (asset: ImageAsset): void => {
   const url = `${ASSET_PATH}${asset.name}`;
-  fetch(url, { cache: "force-cache" })
-    .then(async (res) => {
-      const bytes = new Uint8Array(await res.arrayBuffer());
-      const image = await decodeImage(bytes);
-      if (image) {
-        asset.setRenderImage(image);
-        if (typeof image.unref === 'function') {
-          try {
-            image.unref();
-          } catch (e) {
-            console.warn(`[Rive] Failed to unref image ${asset.name}:`, e);
-          }
-        }
-      }
-    })
-    .catch((error) => {
-      console.error(`Error in fetching rive image asset: ${url}`, error);
-    });
+
+  if (!imageCache.has(url)) {
+    const promise = fetch(url, { cache: "force-cache" })
+      .then(async (res) => {
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        return await decodeImage(bytes);
+      })
+      .catch((error) => {
+        console.error(`Error in fetching rive image asset: ${url}`, error);
+        imageCache.delete(url);
+        return null;
+      });
+    imageCache.set(url, promise);
+  }
+
+  imageCache.get(url)!.then((image) => {
+    if (image) {
+      asset.setRenderImage(image);
+    }
+  });
 };
 
 const setFontAsset = (asset: FontAsset): void => {
   const url = `${ASSET_PATH}${asset.name}.ttf`;
-  fetch(url, { cache: "force-cache" })
-    .then(async (res) => {
-      const bytes = new Uint8Array(await res.arrayBuffer());
-      const font = await decodeFont(bytes);
-      if (font) {
-        asset.setFont(font as any);
-        if (typeof font.unref === 'function') {
-          try {
-            font.unref();
-          } catch (e) {
-            console.warn(`[Rive] Failed to unref font ${asset.name}:`, e);
-          }
-        }
-      }
-    })
-    .catch((error) => {
-      console.error(`Error in fetching rive font asset: ${url}`, error);
-    });
+
+  if (!fontCache.has(url)) {
+    const promise = fetch(url, { cache: "force-cache" })
+      .then(async (res) => {
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        return await decodeFont(bytes);
+      })
+      .catch((error) => {
+        console.error(`Error in fetching rive font asset: ${url}`, error);
+        fontCache.delete(url);
+        return null;
+      });
+    fontCache.set(url, promise);
+  }
+
+  fontCache.get(url)!.then((font) => {
+    if (font) {
+      asset.setFont(font as any);
+    }
+  });
 };
 
 export const riveAssetLoaderHandler = (
