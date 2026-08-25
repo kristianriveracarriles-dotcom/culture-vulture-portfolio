@@ -145,8 +145,12 @@ export function LogicPanel({
   };
 
   return (
-    <div className={`logic-display ${isOpen ? "open" : "closed"}`}>
-      <h2 className="category-label">&gt; LOGIC_CUSTOMIZER</h2>
+    <div className={`logic-panel-container ${isOpen ? "open" : ""}`}>
+      <div className="logic-display">
+        <button className="close-panel-btn" onClick={() => setIsOpen(false)}>
+          [CLOSE_PANEL]
+        </button>
+        <h2 className="category-label">&gt; LOGIC_CUSTOMIZER</h2>
       
       <div className="logic-section" style={{ marginTop: '1rem' }}>
         <div className="logic-item">
@@ -191,6 +195,7 @@ export function LogicPanel({
       <div className="status-box" style={{ marginTop: '1rem', padding: '0.5rem', border: '1px solid var(--color-accent)', fontSize: '0.7rem' }}>
         SKIN_CONTROL_ACTIVE: TRUE
       </div>
+      </div>
     </div>
   );
 }
@@ -203,9 +208,17 @@ export default function WheelspinEngine() {
     outcomeIndex: 2,
     slices: [...DEFAULT_SLICES]
   });
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <div className="case-study-grid">
+        <button
+            className="fab-logic-toggle"
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            aria-label="Toggle Logic Panel"
+        >
+            ⚙️
+        </button>
         <div className="rive-portal">
              <div className="skin-selector" style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10, display: 'flex', gap: '5px' }}>
                 {SKINS.map((skin) => (
@@ -231,8 +244,8 @@ export default function WheelspinEngine() {
         <LogicPanel 
             config={config} 
             setConfig={setConfig} 
-            isOpen={true} 
-            setIsOpen={() => {}} 
+            isOpen={isPanelOpen}
+            setIsOpen={setIsPanelOpen}
         />
     </div>
   );
