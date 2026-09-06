@@ -13,10 +13,12 @@ const fontCache = new Map<string, Promise<any>>();
 
 const setImageAsset = (asset: ImageAsset): void => {
   const url = `${ASSET_PATH}${asset.name}`;
-
-  if (!imageCache.has(url)) {
+if (!imageCache.has(url)) {
     const promise = fetch(url, { cache: "force-cache" })
       .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const bytes = new Uint8Array(await res.arrayBuffer());
         return await decodeImage(bytes);
       })
@@ -37,10 +39,12 @@ const setImageAsset = (asset: ImageAsset): void => {
 
 const setFontAsset = (asset: FontAsset): void => {
   const url = `${ASSET_PATH}${asset.name}.ttf`;
-
-  if (!fontCache.has(url)) {
+if (!fontCache.has(url)) {
     const promise = fetch(url, { cache: "force-cache" })
       .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
         const bytes = new Uint8Array(await res.arrayBuffer());
         return await decodeFont(bytes);
       })
