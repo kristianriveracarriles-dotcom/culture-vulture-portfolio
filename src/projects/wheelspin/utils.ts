@@ -17,6 +17,9 @@ const fetchAsset = <T extends any>(
 ): void => {
   fetch(url, { cache: "force-cache" })
     .then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const bytes = new Uint8Array(await res.arrayBuffer());
       const decoded = await decode(bytes);
       if (decoded) {
