@@ -173,7 +173,12 @@ export function LogicPanel({
             max="12"
             style={{ background: 'transparent', border: 'none', color: 'var(--color-accent)', textAlign: 'right', width: '50px', outline: 'none' }}
             value={config.outcomeIndex + 1} 
-            onChange={(e) => setConfig({ ...config, outcomeIndex: parseInt(e.target.value) - 1 })} 
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              if (!isNaN(val) && val >= 1 && val <= 12) {
+                setConfig({ ...config, outcomeIndex: val - 1 });
+              }
+            }}
           />
         </div>
         
