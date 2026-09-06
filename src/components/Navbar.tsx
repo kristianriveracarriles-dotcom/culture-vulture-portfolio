@@ -1,7 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
     return (
         <nav className="nav">
             <Link to="/" style={{ textDecoration: 'none' }}>
