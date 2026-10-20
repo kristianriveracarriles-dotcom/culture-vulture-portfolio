@@ -46,6 +46,7 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
                 src={videoSrc} 
                 muted 
                 loop 
+                preload="none"
             />
             <div className="project-content">
                 <p className="productions-tag">{tag}</p>

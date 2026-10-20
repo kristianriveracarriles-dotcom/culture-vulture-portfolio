@@ -42,8 +42,13 @@ const fetchAndDecodeAsset = <T>(
   });
 };
 
+export const sanitizeAssetName = (name: string): string => {
+  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+};
+
 const setImageAsset = (asset: ImageAsset): void => {
-  const url = `${ASSET_PATH}${asset.name}`;
+  const safeName = sanitizeAssetName(asset.name);
+  const url = `${ASSET_PATH}${safeName}`;
   fetchAndDecodeAsset(
     url,
     imageCache,
@@ -54,7 +59,8 @@ const setImageAsset = (asset: ImageAsset): void => {
 };
 
 const setFontAsset = (asset: FontAsset): void => {
-  const url = `${ASSET_PATH}${asset.name}.ttf`;
+  const safeName = sanitizeAssetName(asset.name);
+  const url = `${ASSET_PATH}${safeName}.ttf`;
   fetchAndDecodeAsset(
     url,
     fontCache,

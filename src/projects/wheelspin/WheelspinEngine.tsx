@@ -9,11 +9,12 @@ import {
   useViewModelInstanceEnum,
   useViewModelInstanceString,
 } from "@rive-app/react-webgl2";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { riveAssetLoaderHandler } from "./utils";
 
 const STATE_MACHINE_NAME = "State Machine 1";
 const ASSET_PATH = "/assets/rive/";
+const SPIN_OUTCOME_DELAY_MS = 300;
 
 interface Skin {
   id: string;
@@ -77,20 +78,23 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
   const { setValue: setResultDescription } = useViewModelInstanceString(MainVM.description, mainInstance);
   const { setValue: setButtonText } = useViewModelInstanceString("spinButton/buttonText", mainInstance);
   
-  const sSetters = [
-    useViewModelInstanceString("wheelspin/slice1/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice2/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice3/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice4/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice5/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice6/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice7/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice8/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice9/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice10/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice11/sliceText", mainInstance).setValue,
-    useViewModelInstanceString("wheelspin/slice12/sliceText", mainInstance).setValue,
-  ];
+  const s1 = useViewModelInstanceString("wheelspin/slice1/sliceText", mainInstance).setValue;
+  const s2 = useViewModelInstanceString("wheelspin/slice2/sliceText", mainInstance).setValue;
+  const s3 = useViewModelInstanceString("wheelspin/slice3/sliceText", mainInstance).setValue;
+  const s4 = useViewModelInstanceString("wheelspin/slice4/sliceText", mainInstance).setValue;
+  const s5 = useViewModelInstanceString("wheelspin/slice5/sliceText", mainInstance).setValue;
+  const s6 = useViewModelInstanceString("wheelspin/slice6/sliceText", mainInstance).setValue;
+  const s7 = useViewModelInstanceString("wheelspin/slice7/sliceText", mainInstance).setValue;
+  const s8 = useViewModelInstanceString("wheelspin/slice8/sliceText", mainInstance).setValue;
+  const s9 = useViewModelInstanceString("wheelspin/slice9/sliceText", mainInstance).setValue;
+  const s10 = useViewModelInstanceString("wheelspin/slice10/sliceText", mainInstance).setValue;
+  const s11 = useViewModelInstanceString("wheelspin/slice11/sliceText", mainInstance).setValue;
+  const s12 = useViewModelInstanceString("wheelspin/slice12/sliceText", mainInstance).setValue;
+
+  const sSetters = useMemo(
+    () => [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12],
+    [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12]
+  );
 
   // Sync with Props
   useEffect(() => {
@@ -105,7 +109,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
       if (typeof setResultTitle === 'function') setResultTitle(config.title);
       if (typeof setResultDescription === 'function') setResultDescription(config.description);
     }
-  }, [rive, mainInstance, skin, config]);
+  }, [rive, mainInstance, skin, config, sSetters]);
 
   // Handle Spin Event
   useEffect(() => {
@@ -120,7 +124,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
             setResultSliceNumber(configRef.current.outcomeIndex + 1);
             if (setResultPrize) setResultPrize(configRef.current.slices[configRef.current.outcomeIndex]);
             if (setResultPrize2) setResultPrize2(configRef.current.slices[configRef.current.outcomeIndex]);
-          }, 300);
+          }, SPIN_OUTCOME_DELAY_MS);
         }
       }
     };
@@ -144,8 +148,9 @@ export function LogicPanel({
   setIsOpen: (o: boolean) => void;
 }) {
   const handleSliceChange = (idx: number, val: string) => {
+    const sanitizedVal = val.slice(0, 15);
     const newSlices = [...config.slices];
-    newSlices[idx] = val;
+    newSlices[idx] = sanitizedVal;
     setConfig({ ...config, slices: newSlices });
   };
 
@@ -164,7 +169,8 @@ export function LogicPanel({
             className="logic-value" 
             style={{ background: 'transparent', border: 'none', color: 'var(--color-accent)', textAlign: 'right', outline: 'none' }}
             value={config.title} 
-            onChange={(e) => setConfig({ ...config, title: e.target.value })} 
+            maxLength={50}
+            onChange={(e) => setConfig({ ...config, title: e.target.value.slice(0, 50) })} 
           />
         </div>
 
@@ -192,6 +198,7 @@ export function LogicPanel({
             {config.slices.map((s, i) => (
               <input 
                 key={i} 
+                maxLength={15}
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--color-text)', fontSize: '0.7rem', padding: '2px 5px' }}
                 value={s} 
                 onChange={(e) => handleSliceChange(i, e.target.value)} 

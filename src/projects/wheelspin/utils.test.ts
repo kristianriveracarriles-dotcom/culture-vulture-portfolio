@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { riveAssetLoaderHandler } from './utils';
+import { riveAssetLoaderHandler, sanitizeAssetName } from './utils';
 import { FileAsset, ImageAsset, FontAsset } from '@rive-app/react-webgl2';
 
 vi.mock('@rive-app/react-webgl2', () => ({
@@ -107,3 +107,16 @@ describe('riveAssetLoaderHandler', () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 });
+
+describe('sanitizeAssetName', () => {
+  it('should return filename unchanged if safe', () => {
+    expect(sanitizeAssetName('wheel_bg.png')).toBe('wheel_bg.png');
+    expect(sanitizeAssetName('fonts/inter.ttf')).toBe('fontsinter.ttf');
+  });
+
+  it('should strip path traversal sequences and slashes', () => {
+    expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
+  });
+});
+
