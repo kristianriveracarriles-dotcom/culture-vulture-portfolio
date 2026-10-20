@@ -8,54 +8,60 @@ import {
 
 const ASSET_PATH = "/assets/rive/";
 
+const imageCache = new Map<string, Promise<any>>();
+const fontCache = new Map<string, Promise<any>>();
+
+const fetchAndDecodeAsset = <T>(
+  url: string,
+  cache: Map<string, Promise<T | null>>,
+  assetType: string,
+  decodeFn: (bytes: Uint8Array) => Promise<T>,
+  applyFn: (decoded: T) => void
+): void => {
+  if (!cache.has(url)) {
+    const promise = fetch(url, { cache: "force-cache" })
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        return await decodeFn(bytes);
+      })
+      .catch((error) => {
+        console.error(`Error in fetching rive ${assetType} asset: ${url}`, error);
+        cache.delete(url);
+        return null;
+      });
+    cache.set(url, promise);
+  }
+
+  cache.get(url)!.then((decoded) => {
+    if (decoded) {
+      applyFn(decoded);
+    }
+  });
+};
+
 const setImageAsset = (asset: ImageAsset): void => {
   const url = `${ASSET_PATH}${asset.name}`;
-  fetch(url, { cache: "force-cache" })
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const bytes = new Uint8Array(await res.arrayBuffer());
-      const image = await decodeImage(bytes);
-      if (image) {
-        asset.setRenderImage(image);
-        if (typeof image.unref === 'function') {
-          try {
-            image.unref();
-          } catch (e) {
-            console.warn(`[Rive] Failed to unref image ${asset.name}:`, e);
-          }
-        }
-      }
-    })
-    .catch((error) => {
-      console.error(`Error in fetching rive image asset: ${url}`, error);
-    });
+  fetchAndDecodeAsset(
+    url,
+    imageCache,
+    "image",
+    decodeImage,
+    (image) => asset.setRenderImage(image)
+  );
 };
 
 const setFontAsset = (asset: FontAsset): void => {
   const url = `${ASSET_PATH}${asset.name}.ttf`;
-  fetch(url, { cache: "force-cache" })
-    .then(async (res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const bytes = new Uint8Array(await res.arrayBuffer());
-      const font = await decodeFont(bytes);
-      if (font) {
-        asset.setFont(font as any);
-        if (typeof font.unref === 'function') {
-          try {
-            font.unref();
-          } catch (e) {
-            console.warn(`[Rive] Failed to unref font ${asset.name}:`, e);
-          }
-        }
-      }
-    })
-    .catch((error) => {
-      console.error(`Error in fetching rive font asset: ${url}`, error);
-    });
+  fetchAndDecodeAsset(
+    url,
+    fontCache,
+    "font",
+    decodeFont,
+    (font) => asset.setFont(font as any)
+  );
 };
 
 export const riveAssetLoaderHandler = (
