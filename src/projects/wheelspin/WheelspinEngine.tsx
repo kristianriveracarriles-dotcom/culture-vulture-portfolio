@@ -9,7 +9,7 @@ import {
   useViewModelInstanceEnum,
   useViewModelInstanceString,
 } from "@rive-app/react-webgl2";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { riveAssetLoaderHandler } from "./utils";
 
 const STATE_MACHINE_NAME = "State Machine 1";
@@ -50,12 +50,17 @@ const MainVM = {
 
 const spinEventName = "Spin";
 
+const RIVE_LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
+
 function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
+  const configRef = useRef(config);
+  configRef.current = config;
+
   const { rive, RiveComponent } = useRive({
     src: `${ASSET_PATH}${skin.file}`,
     artboard: "Wheelspin Main",
     stateMachines: STATE_MACHINE_NAME,
-    layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
+    layout: RIVE_LAYOUT,
     autoplay: true,
     autoBind: true,
     assetLoader: riveAssetLoaderHandler,
@@ -112,9 +117,9 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
         if (name === spinEventName && setResultSliceNumber) {
           setResultSliceNumber(0);
           setTimeout(() => {
-            setResultSliceNumber(config.outcomeIndex + 1);
-            if (setResultPrize) setResultPrize(config.slices[config.outcomeIndex]);
-            if (setResultPrize2) setResultPrize2(config.slices[config.outcomeIndex]);
+            setResultSliceNumber(configRef.current.outcomeIndex + 1);
+            if (setResultPrize) setResultPrize(configRef.current.slices[configRef.current.outcomeIndex]);
+            if (setResultPrize2) setResultPrize2(configRef.current.slices[configRef.current.outcomeIndex]);
           }, 300);
         }
       }
@@ -122,7 +127,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
 
     rive.on(EventType.RiveEvent, handleRiveEvent);
     return () => rive.off(EventType.RiveEvent, handleRiveEvent);
-  }, [rive, config, setResultSliceNumber, setResultPrize, setResultPrize2]);
+  }, [rive, setResultSliceNumber, setResultPrize, setResultPrize2]);
 
   return <RiveComponent />;
 }
@@ -145,8 +150,12 @@ export function LogicPanel({
   };
 
   return (
-    <div className={`logic-display ${isOpen ? "open" : "closed"}`}>
-      <h2 className="category-label">&gt; LOGIC_CUSTOMIZER</h2>
+    <div className={`logic-panel-container ${isOpen ? "open" : ""}`}>
+      <div className="logic-display">
+        <button className="close-panel-btn" onClick={() => setIsOpen(false)}>
+          [CLOSE_PANEL]
+        </button>
+        <h2 className="category-label">&gt; LOGIC_CUSTOMIZER</h2>
       
       <div className="logic-section" style={{ marginTop: '1rem' }}>
         <div className="logic-item">
@@ -168,7 +177,12 @@ export function LogicPanel({
             max="12"
             style={{ background: 'transparent', border: 'none', color: 'var(--color-accent)', textAlign: 'right', width: '50px', outline: 'none' }}
             value={config.outcomeIndex + 1} 
-            onChange={(e) => setConfig({ ...config, outcomeIndex: parseInt(e.target.value) - 1 })} 
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              if (!isNaN(val) && val >= 1 && val <= 12) {
+                setConfig({ ...config, outcomeIndex: val - 1 });
+              }
+            }}
           />
         </div>
         
@@ -191,6 +205,7 @@ export function LogicPanel({
       <div className="status-box" style={{ marginTop: '1rem', padding: '0.5rem', border: '1px solid var(--color-accent)', fontSize: '0.7rem' }}>
         SKIN_CONTROL_ACTIVE: TRUE
       </div>
+      </div>
     </div>
   );
 }
@@ -203,9 +218,17 @@ export default function WheelspinEngine() {
     outcomeIndex: 2,
     slices: [...DEFAULT_SLICES]
   });
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <div className="case-study-grid">
+        <button
+            className="fab-logic-toggle"
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            aria-label="Toggle Logic Panel"
+        >
+            ⚙️
+        </button>
         <div className="rive-portal">
              <div className="skin-selector" style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10, display: 'flex', gap: '5px' }}>
                 {SKINS.map((skin) => (
@@ -231,8 +254,8 @@ export default function WheelspinEngine() {
         <LogicPanel 
             config={config} 
             setConfig={setConfig} 
-            isOpen={true} 
-            setIsOpen={() => {}} 
+            isOpen={isPanelOpen}
+            setIsOpen={setIsPanelOpen}
         />
     </div>
   );

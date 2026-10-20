@@ -16,7 +16,9 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
 
     const handleMouseEnter = () => {
         if (videoRef.current) {
-            videoRef.current.play().catch(() => {});
+            videoRef.current.play().catch((error) => {
+                console.error("Failed to play video:", error);
+            });
         }
     };
 
