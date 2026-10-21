@@ -96,20 +96,40 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
     [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12]
   );
 
-  // Sync with Props
+  // Optimization: Track static initialization to avoid repeating static setter calls
+  const isInitializedRef = useRef(false);
   useEffect(() => {
-    if (rive && mainInstance) {
-      sSetters.forEach((setter, idx) => {
-        if (typeof setter === 'function' && config.slices[idx]) 
-          setter(config.slices[idx]);
-      });
-      
+    isInitializedRef.current = false;
+  }, [mainInstance, skin.id]);
+
+  // Sync static Rive properties (brand, buttonText) once when instance/skin changes
+  useEffect(() => {
+    if (rive && mainInstance && !isInitializedRef.current) {
       if (typeof setBrand === 'function') setBrand("betRivers");
       if (typeof setButtonText === 'function') setButtonText("Spin_now");
+      isInitializedRef.current = true;
+    }
+  }, [rive, mainInstance, skin.id, setBrand, setButtonText]);
+
+  // Sync dynamic Rive text properties only when title or description change
+  useEffect(() => {
+    if (rive && mainInstance) {
       if (typeof setResultTitle === 'function') setResultTitle(config.title);
       if (typeof setResultDescription === 'function') setResultDescription(config.description);
     }
-  }, [rive, mainInstance, skin, config, sSetters]);
+  }, [rive, mainInstance, config.title, config.description, setResultTitle, setResultDescription]);
+
+  // Sync slices only when slices content changes
+  const slicesJoined = config.slices.join("\0");
+  useEffect(() => {
+    if (rive && mainInstance) {
+      sSetters.forEach((setter, idx) => {
+        if (typeof setter === 'function' && config.slices[idx]) {
+          setter(config.slices[idx]);
+        }
+      });
+    }
+  }, [rive, mainInstance, slicesJoined, sSetters]);
 
   // Handle Spin Event
   useEffect(() => {
@@ -149,6 +169,7 @@ export function LogicPanel({
 }) {
   const handleSliceChange = (idx: number, val: string) => {
     const sanitizedVal = val.slice(0, 15);
+    if (config.slices[idx] === sanitizedVal) return;
     const newSlices = [...config.slices];
     newSlices[idx] = sanitizedVal;
     setConfig({ ...config, slices: newSlices });
