@@ -118,5 +118,16 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should strip URL-encoded path traversal sequences and null bytes', () => {
+    expect(sanitizeAssetName('..%2f..%2fetc/passwd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('%2e%2e%2f%2e%2e%2fsecret.png')).toBe('secret.png');
+    expect(sanitizeAssetName('%252e%252e%252fetc%252fpasswd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('image.png%00.php')).toBe('image.png.php');
+  });
+
+  it('should handle invalid percent-encoding gracefully', () => {
+    expect(sanitizeAssetName('invalid%ZZ/name.png')).toBe('invalid%ZZname.png');
+  });
 });
 

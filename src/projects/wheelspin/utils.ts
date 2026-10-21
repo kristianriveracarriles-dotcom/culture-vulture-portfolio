@@ -43,7 +43,20 @@ const fetchAndDecodeAsset = <T>(
 };
 
 export const sanitizeAssetName = (name: string): string => {
-  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+  let sanitized = name;
+  try {
+    let prev = "";
+    while (sanitized !== prev && sanitized.includes("%")) {
+      prev = sanitized;
+      sanitized = decodeURIComponent(sanitized);
+    }
+  } catch {
+    // Fall back to raw string if decodeURIComponent fails
+  }
+  return sanitized
+    .replace(/[\x00-\x1F\x7F]/g, "")
+    .replace(/^(\.\.[\/\\])+/g, "")
+    .replace(/[\/\\]/g, "");
 };
 
 const setImageAsset = (asset: ImageAsset): void => {
