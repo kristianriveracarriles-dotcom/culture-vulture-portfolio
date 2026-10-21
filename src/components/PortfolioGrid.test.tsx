@@ -53,12 +53,35 @@ describe('PortfolioGrid Component', () => {
   it('navigates to the correct project route on click', () => {
     render(<PortfolioGrid />);
 
-    const cardsBand = screen.getByText('CARDS').closest('section');
+    const cardsBand = screen.getByRole('button', { name: /View CARDS project/i });
     expect(cardsBand).toBeInTheDocument();
 
-    if (cardsBand) {
-      fireEvent.click(cardsBand);
-      expect(mockNavigate).toHaveBeenCalledWith('/card');
-    }
+    fireEvent.click(cardsBand);
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
+  });
+
+  it('navigates on keyboard activation (Enter or Space key)', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByRole('button', { name: /View WHEELSPIN project/i });
+    expect(wheelspinBand).toBeInTheDocument();
+
+    fireEvent.keyDown(wheelspinBand, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+
+    fireEvent.keyDown(wheelspinBand, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+  });
+
+  it('plays and pauses video on focus and blur events', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByRole('button', { name: /View WHEELSPIN project/i });
+
+    fireEvent.focus(wheelspinBand);
+    expect(playMock).toHaveBeenCalled();
+
+    fireEvent.blur(wheelspinBand);
+    expect(pauseMock).toHaveBeenCalled();
   });
 });
