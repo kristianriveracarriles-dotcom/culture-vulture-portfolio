@@ -133,6 +133,12 @@ h1, h2, h3 {
     transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     align-self: center; /* Centered on mobile */
     border: none;
+    outline: none;
+}
+
+.project-band:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 4px;
 }
 
 .project-band--jackpot {
