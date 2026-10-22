@@ -33,12 +33,23 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
         navigate(`/${id}`);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+        }
+    };
+
     return (
         <section 
             className={`project-band ${className}`} 
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label={`${title} - ${subtitle}`}
         >
             <video 
                 ref={videoRef}
@@ -47,6 +58,7 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
                 muted 
                 loop 
                 preload="none"
+                aria-hidden="true"
             />
             <div className="project-content">
                 <p className="productions-tag">{tag}</p>

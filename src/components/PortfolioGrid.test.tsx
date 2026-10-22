@@ -61,4 +61,17 @@ describe('PortfolioGrid Component', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/card');
     }
   });
+
+  it('navigates to the correct project route when pressing Enter or Space key', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByRole('button', { name: /WHEELSPIN/i });
+    expect(wheelspinBand).toBeInTheDocument();
+
+    fireEvent.keyDown(wheelspinBand, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+
+    fireEvent.keyDown(wheelspinBand, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+  });
 });
