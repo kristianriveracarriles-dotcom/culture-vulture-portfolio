@@ -118,5 +118,12 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should handle standalone dots, url-encoded sequences, and nested traversal', () => {
+    expect(sanitizeAssetName('..')).toBe('');
+    expect(sanitizeAssetName('../..')).toBe('');
+    expect(sanitizeAssetName('%2e%2e/')).toBe('');
+    expect(sanitizeAssetName('....//')).toBe('');
+  });
 });
 
