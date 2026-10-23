@@ -118,5 +118,13 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should neutralize double-dot sequences, lone dots, and query parameters', () => {
+    expect(sanitizeAssetName('../..')).toBe('');
+    expect(sanitizeAssetName('..')).toBe('');
+    expect(sanitizeAssetName('.')).toBe('');
+    expect(sanitizeAssetName('%2e%2e%2fetc%2fpasswd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('wheel_bg.png?version=1.0#section')).toBe('wheel_bg.png');
+  });
 });
 
