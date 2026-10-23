@@ -1,0 +1,3 @@
+## 2024-10-23 - Interactive Card Media Previews & Keyboard Accessibility
+**Learning:** In media-rich portfolio layouts with hover-triggered video previews, custom interactive cards (e.g., `<section>` elements) are unnavigable for keyboard and screen-reader users unless `role="button"`, `tabIndex={0}`, `aria-label`, `onFocus`/`onBlur`, and `onKeyDown` (Enter/Space) handlers are attached alongside `:focus-visible` ring styles.
+**Action:** Always mirror mouse hover handlers (`onMouseEnter`/`onMouseLeave`) with keyboard focus handlers (`onFocus`/`onBlur`) for media preview triggers on custom interactive components.
