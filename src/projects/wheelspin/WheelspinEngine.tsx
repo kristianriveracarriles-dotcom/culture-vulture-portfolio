@@ -9,7 +9,7 @@ import {
   useViewModelInstanceEnum,
   useViewModelInstanceString,
 } from "@rive-app/react-webgl2";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, memo } from "react";
 import { riveAssetLoaderHandler } from "./utils";
 
 const STATE_MACHINE_NAME = "State Machine 1";
@@ -53,7 +53,10 @@ const spinEventName = "Spin";
 
 const RIVE_LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
 
-function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
+// Bolt Performance Optimization:
+// Memoize RiveWheelContent to prevent unnecessary re-renders of the WebGL canvas component
+// and Rive view model hooks when parent state changes (e.g., toggling isPanelOpen in WheelspinEngine).
+const RiveWheelContent = memo(function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
   const configRef = useRef(config);
   configRef.current = config;
 
@@ -134,7 +137,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
   }, [rive, setResultSliceNumber, setResultPrize, setResultPrize2]);
 
   return <RiveComponent />;
-}
+});
 
 export function LogicPanel({ 
   config, 

@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import PortfolioGrid from './components/PortfolioGrid';
-import WheelspinEngine from './projects/wheelspin/WheelspinEngine';
 import './styles/index.css';
+
+// Bolt Performance Optimization:
+// Code-split heavy case study route (WheelspinEngine & @rive-app/react-webgl2) using React.lazy.
+// Prevents downloading ~500KB Rive WebGL runtime on initial homepage render.
+const WheelspinEngine = lazy(() => import('./projects/wheelspin/WheelspinEngine'));
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -42,7 +46,9 @@ const AnimatedRoutes = () => {
                 <Route path="/wheelspin" element={
                     <PageWrapper>
                         <main className="case-study-hero">
-                            <WheelspinEngine />
+                            <Suspense fallback={<div className="loading-fallback">LOADING...</div>}>
+                                <WheelspinEngine />
+                            </Suspense>
                         </main>
                     </PageWrapper>
                 } />

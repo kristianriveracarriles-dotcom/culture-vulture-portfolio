@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface ProjectBandProps {
@@ -10,7 +10,10 @@ interface ProjectBandProps {
     className: string;
 }
 
-const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, videoSrc, className }) => {
+// Bolt Performance Optimization:
+// Memoize ProjectBand component to prevent unnecessary video DOM element re-renders
+// when parent components re-render.
+const ProjectBand: React.FC<ProjectBandProps> = memo(({ id, title, tag, subtitle, videoSrc, className }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const navigate = useNavigate();
 
@@ -55,7 +58,7 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
             </div>
         </section>
     );
-};
+});
 
 const PortfolioGrid: React.FC = () => {
     return (
