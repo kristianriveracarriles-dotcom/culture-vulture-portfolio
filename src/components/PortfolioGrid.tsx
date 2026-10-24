@@ -33,12 +33,25 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
         navigate(`/${id}`);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            navigate(`/${id}`);
+        }
+    };
+
     return (
         <section 
             className={`project-band ${className}`} 
+            tabIndex={0}
+            role="button"
+            aria-label={`View ${title} project: ${subtitle}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onFocus={handleMouseEnter}
+            onBlur={handleMouseLeave}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
         >
             <video 
                 ref={videoRef}

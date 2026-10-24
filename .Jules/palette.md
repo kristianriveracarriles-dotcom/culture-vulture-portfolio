@@ -1,0 +1,3 @@
+## 2025-05-18 - Interactive Section Bands Focus & Keyboard Usability
+**Learning:** In brutalist/custom grid layouts where `<section>` elements act as major interactive cards with media overlays, mouse events (`onMouseEnter`, `onClick`) leave keyboard and screen reader users with an inaccessible UI. Adding `tabIndex={0}`, `role="button"`, `aria-label`, `onKeyDown` (`Enter`/`Space`), and `onFocus`/`onBlur` handlers alongside `:focus-visible` styles ensures media triggers and navigation work seamlessly for all users.
+**Action:** Always verify custom interactive containers (cards, bands, tiles) have keyboard focus, interactive roles, key handling, and matching `:focus-visible` visual feedback.
