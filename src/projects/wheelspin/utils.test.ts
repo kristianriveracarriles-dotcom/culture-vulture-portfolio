@@ -118,5 +118,21 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should prevent percent-encoded path traversal bypasses', () => {
+    expect(sanitizeAssetName('%2e%2e%2f%2e%2e%2fetc%2fpasswd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('%2E%2E%2Fsecret.png')).toBe('secret.png');
+    expect(sanitizeAssetName('..%2f..%2fconfig.json')).toBe('config.json');
+  });
+
+  it('should handle nested path traversal sequences', () => {
+    expect(sanitizeAssetName('....//....//secret.txt')).toBe('secret.txt');
+    expect(sanitizeAssetName('....\\\\....\\\\secret.txt')).toBe('secret.txt');
+  });
+
+  it('should strip query strings, fragments, and null bytes', () => {
+    expect(sanitizeAssetName('bg.png?v=123#test')).toBe('bg.png');
+    expect(sanitizeAssetName('image.png\0.php')).toBe('image.png.php');
+  });
 });
 
