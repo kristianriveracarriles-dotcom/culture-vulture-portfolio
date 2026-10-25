@@ -14,7 +14,7 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
     const videoRef = useRef<HTMLVideoElement>(null);
     const navigate = useNavigate();
 
-    const handleMouseEnter = () => {
+    const handlePlayVideo = () => {
         if (videoRef.current) {
             videoRef.current.play().catch((error) => {
                 console.error("Failed to play video:", error);
@@ -22,7 +22,7 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
         }
     };
 
-    const handleMouseLeave = () => {
+    const handlePauseVideo = () => {
         if (videoRef.current) {
             videoRef.current.pause();
         }
@@ -33,12 +33,25 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
         navigate(`/${id}`);
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+        }
+    };
+
     return (
         <section 
+            role="button"
+            tabIndex={0}
+            aria-label={`View ${title} project: ${subtitle}`}
             className={`project-band ${className}`} 
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            onMouseEnter={handlePlayVideo}
+            onMouseLeave={handlePauseVideo}
+            onFocus={handlePlayVideo}
+            onBlur={handlePauseVideo}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
         >
             <video 
                 ref={videoRef}
@@ -47,6 +60,7 @@ const ProjectBand: React.FC<ProjectBandProps> = ({ id, title, tag, subtitle, vid
                 muted 
                 loop 
                 preload="none"
+                aria-hidden="true"
             />
             <div className="project-content">
                 <p className="productions-tag">{tag}</p>
