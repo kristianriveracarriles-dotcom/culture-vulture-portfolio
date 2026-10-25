@@ -42,8 +42,22 @@ const fetchAndDecodeAsset = <T>(
   });
 };
 
+/**
+ * Sanitizes asset names to prevent path traversal attacks when constructing resource URLs.
+ * Decodes URI components (including nested encoding), strips path separators (\ and /), and removes '..' sequences.
+ */
 export const sanitizeAssetName = (name: string): string => {
-  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+  let decoded = name;
+  for (let i = 0; i < 3; i++) {
+    try {
+      const next = decodeURIComponent(decoded);
+      if (next === decoded) break;
+      decoded = next;
+    } catch {
+      break;
+    }
+  }
+  return decoded.replace(/[/\\]/g, "").replace(/\.\./g, "");
 };
 
 const setImageAsset = (asset: ImageAsset): void => {
