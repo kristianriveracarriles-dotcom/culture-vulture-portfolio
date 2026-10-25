@@ -118,5 +118,17 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should eliminate single/double dot-dot sequences without trailing slashes', () => {
+    expect(sanitizeAssetName('..')).toBe('');
+    expect(sanitizeAssetName('../..')).toBe('');
+    expect(sanitizeAssetName('....//')).toBe('');
+  });
+
+  it('should decode URL-encoded path traversal sequences before sanitizing', () => {
+    expect(sanitizeAssetName('%2e%2e%2fetc%2fpasswd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('%252e%252e%252fetc%252fpasswd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('%2e%2e')).toBe('');
+  });
 });
 

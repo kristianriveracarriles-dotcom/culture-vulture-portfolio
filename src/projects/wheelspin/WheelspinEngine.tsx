@@ -109,7 +109,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
       if (typeof setResultTitle === 'function') setResultTitle(config.title);
       if (typeof setResultDescription === 'function') setResultDescription(config.description);
     }
-  }, [rive, mainInstance, skin, config, sSetters]);
+  }, [rive, mainInstance, skin, config, sSetters, setBrand, setButtonText, setResultDescription, setResultTitle]);
 
   // Handle Spin Event
   useEffect(() => {
