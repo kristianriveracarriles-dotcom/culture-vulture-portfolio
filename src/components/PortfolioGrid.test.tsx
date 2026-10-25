@@ -61,4 +61,37 @@ describe('PortfolioGrid Component', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/card');
     }
   });
+
+  it('has accessible role, tabIndex, and aria-label', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBtn = screen.getByRole('button', { name: /View WHEELSPIN project/i });
+    expect(wheelspinBtn).toBeInTheDocument();
+    expect(wheelspinBtn).toHaveAttribute('tabIndex', '0');
+  });
+
+  it('plays and pauses video on focus and blur events', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBtn = screen.getByRole('button', { name: /View WHEELSPIN project/i });
+    fireEvent.focus(wheelspinBtn);
+    expect(playMock).toHaveBeenCalled();
+
+    fireEvent.blur(wheelspinBtn);
+    expect(pauseMock).toHaveBeenCalled();
+  });
+
+  it('navigates on Enter and Space key presses', () => {
+    render(<PortfolioGrid />);
+
+    const cardsBtn = screen.getByRole('button', { name: /View CARDS project/i });
+
+    fireEvent.keyDown(cardsBtn, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
+
+    mockNavigate.mockClear();
+
+    fireEvent.keyDown(cardsBtn, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
+  });
 });
