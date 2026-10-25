@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import PortfolioGrid from './components/PortfolioGrid';
-import WheelspinEngine from './projects/wheelspin/WheelspinEngine';
 import './styles/index.css';
+
+// Performance Optimization: Code-split WheelspinEngine (which includes @rive-app/react-webgl2 heavy WASM and assets)
+// so it is loaded lazily on demand, significantly reducing the initial bundle load time for landing page visitors.
+const WheelspinEngine = lazy(() => import('./projects/wheelspin/WheelspinEngine'));
+
+const LoadingFallback = () => (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <h1 className="reg-error" data-text="LOADING...">LOADING...</h1>
+    </div>
+);
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -42,7 +51,9 @@ const AnimatedRoutes = () => {
                 <Route path="/wheelspin" element={
                     <PageWrapper>
                         <main className="case-study-hero">
-                            <WheelspinEngine />
+                            <Suspense fallback={<LoadingFallback />}>
+                                <WheelspinEngine />
+                            </Suspense>
                         </main>
                     </PageWrapper>
                 } />
