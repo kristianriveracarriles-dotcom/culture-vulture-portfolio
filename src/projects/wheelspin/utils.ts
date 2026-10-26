@@ -42,8 +42,19 @@ const fetchAndDecodeAsset = <T>(
   });
 };
 
+// Security: Prevent path traversal vulnerabilities by decoding URL encodings
+// and stripping directory separators, leading dots, and dot-dot traversal sequences.
 export const sanitizeAssetName = (name: string): string => {
-  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+  let decoded = name;
+  try {
+    decoded = decodeURIComponent(name);
+  } catch {
+    // Keep raw string if URI component decoding fails
+  }
+  return decoded
+    .replace(/^(\.\.[\/\\])+/g, "")
+    .replace(/[\/\\]/g, "")
+    .replace(/^\.+/, "");
 };
 
 const setImageAsset = (asset: ImageAsset): void => {
