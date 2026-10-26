@@ -9,7 +9,7 @@ import {
   useViewModelInstanceEnum,
   useViewModelInstanceString,
 } from "@rive-app/react-webgl2";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, memo } from "react";
 import { riveAssetLoaderHandler } from "./utils";
 
 const STATE_MACHINE_NAME = "State Machine 1";
@@ -53,7 +53,9 @@ const spinEventName = "Spin";
 
 const RIVE_LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
 
-function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
+// Memoize RiveWheelContent to prevent heavy WebGL canvas and 15+ Rive hook re-evaluations
+// when parent WheelspinEngine state (e.g., isPanelOpen toggle) changes.
+const RiveWheelContent = memo(function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig }) {
   const configRef = useRef(config);
   configRef.current = config;
 
@@ -109,7 +111,7 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
       if (typeof setResultTitle === 'function') setResultTitle(config.title);
       if (typeof setResultDescription === 'function') setResultDescription(config.description);
     }
-  }, [rive, mainInstance, skin, config, sSetters]);
+  }, [rive, mainInstance, skin, config, sSetters, setBrand, setButtonText, setResultTitle, setResultDescription]);
 
   // Handle Spin Event
   useEffect(() => {
@@ -134,9 +136,9 @@ function RiveWheelContent({ skin, config }: { skin: Skin; config: WheelConfig })
   }, [rive, setResultSliceNumber, setResultPrize, setResultPrize2]);
 
   return <RiveComponent />;
-}
+});
 
-export function LogicPanel({ 
+export const LogicPanel = memo(function LogicPanel({
   config, 
   setConfig, 
   isOpen, 
@@ -215,7 +217,7 @@ export function LogicPanel({
       </div>
     </div>
   );
-}
+});
 
 export default function WheelspinEngine() {
   const [currentSkin, setCurrentSkin] = useState(SKINS[0]);
