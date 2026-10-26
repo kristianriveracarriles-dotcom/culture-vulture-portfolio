@@ -1,0 +1,3 @@
+## 2025-05-18 - Non-Button Interactive Project Cards & Focus Video Triggers
+**Learning:** Interactive section cards (`<section onClick={...}>`) lack keyboard focus accessibility and ARIA semantics by default, excluding keyboard-only and screen reader users from navigating project portfolios. Additionally, hover-only media previews (like videos) hide dynamic visual feedback from keyboard users unless bound to focus and blur events.
+**Action:** Always assign `role="button"`, `tabIndex={0}`, descriptive `aria-label`, and `onKeyDown` handlers (supporting Enter and Space keys) to clickable card elements. Synchronize hover state handlers (`onMouseEnter`/`onMouseLeave`) with focus state handlers (`onFocus`/`onBlur`) and provide explicit `:focus-visible` styling.
