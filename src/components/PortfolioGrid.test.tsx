@@ -53,12 +53,36 @@ describe('PortfolioGrid Component', () => {
   it('navigates to the correct project route on click', () => {
     render(<PortfolioGrid />);
 
-    const cardsBand = screen.getByText('CARDS').closest('section');
+    const cardsBand = screen.getByRole('button', { name: /View project CARDS/i });
     expect(cardsBand).toBeInTheDocument();
 
-    if (cardsBand) {
-      fireEvent.click(cardsBand);
-      expect(mockNavigate).toHaveBeenCalledWith('/card');
-    }
+    fireEvent.click(cardsBand);
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
+  });
+
+  it('supports keyboard navigation via Enter and Space keys', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByRole('button', { name: /View project WHEELSPIN/i });
+    expect(wheelspinBand).toBeInTheDocument();
+
+    fireEvent.keyDown(wheelspinBand, { key: 'Enter', code: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+
+    fireEvent.keyDown(wheelspinBand, { key: ' ', code: 'Space' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+  });
+
+  it('plays and pauses video on focus and blur events', () => {
+    render(<PortfolioGrid />);
+
+    const jackpotBand = screen.getByRole('button', { name: /View project JACKPOT/i });
+    expect(jackpotBand).toBeInTheDocument();
+
+    fireEvent.focus(jackpotBand);
+    expect(playMock).toHaveBeenCalled();
+
+    fireEvent.blur(jackpotBand);
+    expect(pauseMock).toHaveBeenCalled();
   });
 });
