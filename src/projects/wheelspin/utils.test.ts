@@ -111,12 +111,14 @@ describe('riveAssetLoaderHandler', () => {
 describe('sanitizeAssetName', () => {
   it('should return filename unchanged if safe', () => {
     expect(sanitizeAssetName('wheel_bg.png')).toBe('wheel_bg.png');
-    expect(sanitizeAssetName('fonts/inter.ttf')).toBe('fontsinter.ttf');
   });
 
-  it('should strip path traversal sequences and slashes', () => {
-    expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
-    expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
+  it('should strip directory prefixes, path traversal sequences and slashes', () => {
+    expect(sanitizeAssetName('fonts/inter.ttf')).toBe('inter.ttf');
+    expect(sanitizeAssetName('../../../etc/passwd')).toBe('passwd');
+    expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('system32');
+    expect(sanitizeAssetName('foo/../bar.png')).toBe('bar.png');
+    expect(sanitizeAssetName('..\\sub\\file.png')).toBe('file.png');
   });
 });
 
