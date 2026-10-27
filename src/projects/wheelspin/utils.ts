@@ -43,7 +43,8 @@ const fetchAndDecodeAsset = <T>(
 };
 
 export const sanitizeAssetName = (name: string): string => {
-  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+  // Strip path traversal sequences and any directory components or slashes/backslashes
+  return name.replace(/^.*[\/\\]/, "").replace(/\.\./g, "").replace(/[\/\\]/g, "");
 };
 
 const setImageAsset = (asset: ImageAsset): void => {
