@@ -1,0 +1,3 @@
+## 2026-10-27 - Route Code-Splitting Heavy Dependencies
+**Learning:** Monolithic imports of large WebGL libraries like `@rive-app/react-webgl2` in specific sub-routes bloat the initial JavaScript bundle unnecessarily for home page visitors. Using `React.lazy` and `React.Suspense` for sub-routes isolates heavy asset and library bundles (`WheelspinEngine`), reducing initial JS size from ~588 kB to ~280 kB (a >52% reduction in main bundle size).
+**Action:** Always code-split routes containing heavy third-party canvas or WebGL runtime dependencies so landing page load performance remains fast and unblocked.
