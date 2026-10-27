@@ -61,4 +61,28 @@ describe('PortfolioGrid Component', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/card');
     }
   });
+
+  it('supports keyboard navigation and accessibility attributes', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinButtons = screen.getAllByRole('button', { name: /View WHEELSPIN project/i });
+    expect(wheelspinButtons.length).toBeGreaterThan(0);
+    const wheelspinBand = wheelspinButtons[0];
+
+    expect(wheelspinBand).toHaveAttribute('tabindex', '0');
+
+    // Focus / Blur triggers video preview
+    fireEvent.focus(wheelspinBand);
+    expect(playMock).toHaveBeenCalled();
+
+    fireEvent.blur(wheelspinBand);
+    expect(pauseMock).toHaveBeenCalled();
+
+    // Keyboard navigation (Enter / Space)
+    fireEvent.keyDown(wheelspinBand, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+
+    fireEvent.keyDown(wheelspinBand, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+  });
 });

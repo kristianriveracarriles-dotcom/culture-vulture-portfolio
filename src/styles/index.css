@@ -135,6 +135,11 @@ h1, h2, h3 {
     border: none;
 }
 
+.project-band:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: -3px;
+}
+
 .project-band--jackpot {
     height: 60vh;
     border-top: 4px solid var(--color-accent); /* Thinner border for mobile */
