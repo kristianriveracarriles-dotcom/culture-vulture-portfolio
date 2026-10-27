@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
-import PortfolioGrid from './components/PortfolioGrid';
-import WheelspinEngine from './projects/wheelspin/WheelspinEngine';
 import './styles/index.css';
+
+// Lazy load route components to reduce initial bundle size and delay loading heavy dependencies (like @rive-app/react-webgl2)
+const PortfolioGrid = lazy(() => import('./components/PortfolioGrid'));
+const WheelspinEngine = lazy(() => import('./projects/wheelspin/WheelspinEngine'));
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -30,32 +32,34 @@ const AnimatedRoutes = () => {
     const location = useLocation();
     
     return (
-        <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-                <Route path="/" element={
-                    <PageWrapper>
-                        <main>
-                            <PortfolioGrid />
-                        </main>
-                    </PageWrapper>
-                } />
-                <Route path="/wheelspin" element={
-                    <PageWrapper>
-                        <main className="case-study-hero">
-                            <WheelspinEngine />
-                        </main>
-                    </PageWrapper>
-                } />
-                {/* Fallback for other projects */}
-                <Route path="/:id" element={
-                    <PageWrapper>
-                        <main style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <h1 className="reg-error" data-text="COMING SOON">COMING SOON</h1>
-                        </main>
-                    </PageWrapper>
-                } />
-            </Routes>
-        </AnimatePresence>
+        <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--color-accent)' }}>LOADING...</div>}>
+            <AnimatePresence mode="wait">
+                <Routes location={location} key={location.pathname}>
+                    <Route path="/" element={
+                        <PageWrapper>
+                            <main>
+                                <PortfolioGrid />
+                            </main>
+                        </PageWrapper>
+                    } />
+                    <Route path="/wheelspin" element={
+                        <PageWrapper>
+                            <main className="case-study-hero">
+                                <WheelspinEngine />
+                            </main>
+                        </PageWrapper>
+                    } />
+                    {/* Fallback for other projects */}
+                    <Route path="/:id" element={
+                        <PageWrapper>
+                            <main style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <h1 className="reg-error" data-text="COMING SOON">COMING SOON</h1>
+                            </main>
+                        </PageWrapper>
+                    } />
+                </Routes>
+            </AnimatePresence>
+        </Suspense>
     );
 };
 
