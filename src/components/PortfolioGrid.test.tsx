@@ -28,11 +28,17 @@ describe('PortfolioGrid Component', () => {
     vi.clearAllMocks();
   });
 
-  it('renders all project bands with correct titles', () => {
+  it('renders all project bands with correct titles and accessibility attributes', () => {
     render(<PortfolioGrid />);
-    expect(screen.getByText('WHEELSPIN')).toBeInTheDocument();
+    const wheelspinTitle = screen.getByText('WHEELSPIN');
+    expect(wheelspinTitle).toBeInTheDocument();
     expect(screen.getByText('CARDS')).toBeInTheDocument();
     expect(screen.getByText('JACKPOT')).toBeInTheDocument();
+
+    const wheelspinBand = wheelspinTitle.closest('section');
+    expect(wheelspinBand).toHaveAttribute('role', 'button');
+    expect(wheelspinBand).toHaveAttribute('tabindex', '0');
+    expect(wheelspinBand).toHaveAttribute('aria-label', 'View WHEELSPIN project: Aggressive Motion Architecture');
   });
 
   it('plays and pauses video on hover events', async () => {
@@ -50,6 +56,21 @@ describe('PortfolioGrid Component', () => {
     }
   });
 
+  it('plays and pauses video on focus and blur events', async () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByText('WHEELSPIN').closest('section');
+    expect(wheelspinBand).toBeInTheDocument();
+
+    if (wheelspinBand) {
+      fireEvent.focus(wheelspinBand);
+      expect(playMock).toHaveBeenCalled();
+
+      fireEvent.blur(wheelspinBand);
+      expect(pauseMock).toHaveBeenCalled();
+    }
+  });
+
   it('navigates to the correct project route on click', () => {
     render(<PortfolioGrid />);
 
@@ -59,6 +80,21 @@ describe('PortfolioGrid Component', () => {
     if (cardsBand) {
       fireEvent.click(cardsBand);
       expect(mockNavigate).toHaveBeenCalledWith('/card');
+    }
+  });
+
+  it('navigates to the correct project route on Enter and Space keypress', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByText('WHEELSPIN').closest('section');
+    expect(wheelspinBand).toBeInTheDocument();
+
+    if (wheelspinBand) {
+      fireEvent.keyDown(wheelspinBand, { key: 'Enter' });
+      expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+
+      fireEvent.keyDown(wheelspinBand, { key: ' ' });
+      expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
     }
   });
 });
