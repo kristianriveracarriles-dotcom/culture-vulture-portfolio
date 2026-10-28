@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import PortfolioGrid from './components/PortfolioGrid';
-import WheelspinEngine from './projects/wheelspin/WheelspinEngine';
 import './styles/index.css';
+
+// Performance Optimization: Lazy-load heavy route components like WheelspinEngine
+// (which pulls in @rive-app/react-webgl2 WASM runtime) to keep initial bundle size lean.
+const WheelspinEngine = lazy(() => import('./projects/wheelspin/WheelspinEngine'));
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -42,7 +45,9 @@ const AnimatedRoutes = () => {
                 <Route path="/wheelspin" element={
                     <PageWrapper>
                         <main className="case-study-hero">
-                            <WheelspinEngine />
+                            <Suspense fallback={null}>
+                                <WheelspinEngine />
+                            </Suspense>
                         </main>
                     </PageWrapper>
                 } />
