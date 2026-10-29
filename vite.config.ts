@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     fs: {
-      strict: false,
+      strict: true,
     },
   },
   test: {
