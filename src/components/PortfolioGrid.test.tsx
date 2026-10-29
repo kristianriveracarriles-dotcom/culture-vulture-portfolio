@@ -53,12 +53,23 @@ describe('PortfolioGrid Component', () => {
   it('navigates to the correct project route on click', () => {
     render(<PortfolioGrid />);
 
-    const cardsBand = screen.getByText('CARDS').closest('section');
+    const cardsBand = screen.getByRole('button', { name: 'View CARDS project' });
     expect(cardsBand).toBeInTheDocument();
 
-    if (cardsBand) {
-      fireEvent.click(cardsBand);
-      expect(mockNavigate).toHaveBeenCalledWith('/card');
-    }
+    fireEvent.click(cardsBand);
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
+  });
+
+  it('navigates to the correct project route on Enter or Space keydown', () => {
+    render(<PortfolioGrid />);
+
+    const cardsBand = screen.getByRole('button', { name: 'View CARDS project' });
+    expect(cardsBand).toBeInTheDocument();
+
+    fireEvent.keyDown(cardsBand, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
+
+    fireEvent.keyDown(cardsBand, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/card');
   });
 });
