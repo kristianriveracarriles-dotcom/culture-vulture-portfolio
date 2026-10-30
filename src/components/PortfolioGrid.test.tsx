@@ -61,4 +61,36 @@ describe('PortfolioGrid Component', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/card');
     }
   });
+
+  it('has accessible roles and labels', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinLink = screen.getByRole('link', { name: 'WHEELSPIN - Aggressive Motion Architecture' });
+    expect(wheelspinLink).toBeInTheDocument();
+    expect(wheelspinLink).toHaveAttribute('tabIndex', '0');
+  });
+
+  it('plays and pauses video on focus and blur events', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByRole('link', { name: 'WHEELSPIN - Aggressive Motion Architecture' });
+
+    fireEvent.focus(wheelspinBand);
+    expect(playMock).toHaveBeenCalled();
+
+    fireEvent.blur(wheelspinBand);
+    expect(pauseMock).toHaveBeenCalled();
+  });
+
+  it('navigates on Enter and Space keypress', () => {
+    render(<PortfolioGrid />);
+
+    const wheelspinBand = screen.getByRole('link', { name: 'WHEELSPIN - Aggressive Motion Architecture' });
+
+    fireEvent.keyDown(wheelspinBand, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+
+    fireEvent.keyDown(wheelspinBand, { key: ' ' });
+    expect(mockNavigate).toHaveBeenCalledWith('/wheelspin');
+  });
 });

@@ -1,0 +1,3 @@
+## 2026-10-30 - Interactive Card Grid Keyboard Navigation & Video Preview Triggering
+**Learning:** In media-rich portfolio card grids, interactive project bands with background videos often lack keyboard focusability and ARIA semantics. Adding `role="link"`, `tabIndex={0}`, and triggering video play/pause on `focus`/`blur` alongside `hover` enables seamless keyboard accessibility and visual media feedback without disturbing the brutalist design system.
+**Action:** Always check interactive card components with media backgrounds to ensure `tabIndex={0}`, `role="link"`, `aria-label`, keyboard activation (`Enter`/`Space`), and focus-visible outlines are wired up alongside mouse hover state handlers.
