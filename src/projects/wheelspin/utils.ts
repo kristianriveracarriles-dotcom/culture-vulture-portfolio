@@ -43,7 +43,20 @@ const fetchAndDecodeAsset = <T>(
 };
 
 export const sanitizeAssetName = (name: string): string => {
-  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+  if (!name) return "";
+  let decoded = name;
+  try {
+    decoded = decodeURIComponent(name);
+  } catch {
+    // If malformed URI sequence, keep original
+  }
+  // Remove null bytes and control characters
+  decoded = decoded.replace(/[\x00-\x1f\x7f]/g, "");
+  // Remove all slashes and backslashes to block directory path navigation
+  let sanitized = decoded.replace(/[\/\\]/g, "");
+  // Remove any remaining path traversal sequences like '..' or '...'
+  sanitized = sanitized.replace(/\.\.+/g, "");
+  return sanitized;
 };
 
 const setImageAsset = (asset: ImageAsset): void => {
