@@ -118,5 +118,17 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should strip standalone .. and URL-encoded path traversal sequences', () => {
+    expect(sanitizeAssetName('..')).toBe('');
+    expect(sanitizeAssetName('%2e%2e%2f%2e%2e%2fetc/passwd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('foo/../bar')).toBe('foobar');
+  });
+
+  it('should strip null bytes, control characters, and handle empty input', () => {
+    expect(sanitizeAssetName('test\0.png')).toBe('test.png');
+    expect(sanitizeAssetName('test\n.png')).toBe('test.png');
+    expect(sanitizeAssetName('')).toBe('');
+  });
 });
 
