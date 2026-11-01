@@ -3,8 +3,11 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import PortfolioGrid from './components/PortfolioGrid';
-import WheelspinEngine from './projects/wheelspin/WheelspinEngine';
 import './styles/index.css';
+
+// ⚡ Bolt Optimization: Lazy load heavy route components (e.g., WheelspinEngine with Rive WebGL runtime)
+// to split them into separate dynamic chunks, reducing initial JS bundle size and accelerating initial page load.
+const WheelspinEngine = React.lazy(() => import('./projects/wheelspin/WheelspinEngine'));
 
 const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -42,7 +45,9 @@ const AnimatedRoutes = () => {
                 <Route path="/wheelspin" element={
                     <PageWrapper>
                         <main className="case-study-hero">
-                            <WheelspinEngine />
+                            <React.Suspense fallback={<div className="loading-fallback">Loading...</div>}>
+                                <WheelspinEngine />
+                            </React.Suspense>
                         </main>
                     </PageWrapper>
                 } />
