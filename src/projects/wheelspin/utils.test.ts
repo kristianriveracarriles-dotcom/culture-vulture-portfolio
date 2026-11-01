@@ -118,5 +118,20 @@ describe('sanitizeAssetName', () => {
     expect(sanitizeAssetName('../../../etc/passwd')).toBe('etcpasswd');
     expect(sanitizeAssetName('..\\..\\windows\\system32')).toBe('windowssystem32');
   });
+
+  it('should handle nested or standalone path traversal attempts', () => {
+    expect(sanitizeAssetName('..')).toBe('');
+    expect(sanitizeAssetName('../..')).toBe('');
+    expect(sanitizeAssetName('..//..//etc/passwd')).toBe('etcpasswd');
+    expect(sanitizeAssetName('....//....//etc/passwd')).toBe('etcpasswd');
+  });
+
+  it('should decode URL-encoded path traversal sequences and sanitize them', () => {
+    expect(sanitizeAssetName('%2e%2e%2f%2e%2e%2fetc%2fpasswd')).toBe('etcpasswd');
+  });
+
+  it('should strip query strings and hash parameters to prevent URL manipulation', () => {
+    expect(sanitizeAssetName('image.png?key=val#hash')).toBe('image.pngkey=valhash');
+  });
 });
 

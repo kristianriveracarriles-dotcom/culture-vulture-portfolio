@@ -42,8 +42,28 @@ const fetchAndDecodeAsset = <T>(
   });
 };
 
+/**
+ * Sanitizes asset filenames to prevent path traversal attacks and URL manipulation.
+ * URL-decodes the input, strips control characters, path separators, and query/hash
+ * delimiters, and iteratively removes '..' sequences to prevent nested bypasses.
+ */
 export const sanitizeAssetName = (name: string): string => {
-  return name.replace(/^(\.\.[\/\\])+/g, "").replace(/[\/\\]/g, "");
+  if (!name) return "";
+  let sanitized = name;
+  try {
+    sanitized = decodeURIComponent(sanitized);
+  } catch {
+    // If decoding fails due to malformed URI sequence, continue with original string
+  }
+  // Strip null bytes and control characters
+  sanitized = sanitized.replace(/[\x00-\x1f\x7f]/g, "");
+  // Strip path separators, query parameters, and hash fragments
+  sanitized = sanitized.replace(/[\/\\?#]/g, "");
+  // Iteratively remove path traversal '..' sequences to prevent bypasses like '....//'
+  while (sanitized.includes("..")) {
+    sanitized = sanitized.replace(/\.\./g, "");
+  }
+  return sanitized;
 };
 
 const setImageAsset = (asset: ImageAsset): void => {
