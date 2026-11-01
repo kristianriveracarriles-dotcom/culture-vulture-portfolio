@@ -186,10 +186,16 @@ h1, h2, h3 {
     transition: filter 0.5s ease, transform 0.5s ease;
 }
 
-.project-band:hover .project-media {
+.project-band:hover .project-media,
+.project-band:focus-visible .project-media {
     filter: grayscale(0) contrast(1);
     transform: scale(1.05);
     animation: glitch-video 0.2s infinite;
+}
+
+.project-band:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
 }
 
 .video-error .project-media {
@@ -244,7 +250,8 @@ h1, h2, h3 {
     pointer-events: none;
 }
 
-.project-band:hover::after {
+.project-band:hover::after,
+.project-band:focus-visible::after {
     opacity: 1;
 }
 
