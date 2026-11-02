@@ -244,8 +244,14 @@ h1, h2, h3 {
     pointer-events: none;
 }
 
-.project-band:hover::after {
+.project-band:hover::after,
+.project-band:focus-visible::after {
     opacity: 1;
+}
+
+.project-band:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
 }
 
 /* Project Info - Mobile First */
