@@ -9,7 +9,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     fs: {
-      strict: false,
+      // Enforce strict file system serving to prevent arbitrary file disclosure (e.g. /@fs/etc/passwd)
+      strict: true,
     },
   },
   test: {
