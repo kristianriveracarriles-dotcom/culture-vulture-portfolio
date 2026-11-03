@@ -1,0 +1,4 @@
+## 2026-11-03 - Restrict Vite Dev Server File System Access (server.fs.strict)
+**Vulnerability:** The Vite dev server configuration explicitly set `server.fs.strict: false`, which disabled Vite's built-in file serving boundary restrictions and allowed arbitrary file access on the host system via `/@fs/` paths (e.g. `/@fs/etc/passwd`).
+**Learning:** In Vite projects, setting `server.fs.strict: false` bypasses path traversal protections by design to allow serving files outside the workspace root, but inadvertently exposes sensitive system and environment files to any client or browser origin reaching the dev server.
+**Prevention:** Keep `server.fs.strict: true` (the secure default in Vite). If specific external directories are needed during development, restrict them explicitly with `server.fs.allow` rather than disabling strict mode entirely.
